@@ -1,3 +1,4 @@
+
 import json
 from pathlib import Path
 
@@ -56,8 +57,14 @@ def run_epoch(model, loader, loss_fn, optimizer=None):
     return mean_loss, mean_absolute_error
 
 
-def train_model(train_loader, val_loader, epochs=100, learning_rate=0.001):
-    torch.manual_seed(42)
+def train_model(
+    train_loader,
+    val_loader,
+    epochs=100,
+    learning_rate=0.001,
+    seed=42,
+):
+    torch.manual_seed(seed)
 
     model = BikeNet()
     loss_fn = nn.MSELoss()
@@ -74,9 +81,13 @@ def train_model(train_loader, val_loader, epochs=100, learning_rate=0.001):
     history = []
 
     for epoch in range(1, epochs + 1):
-        train_loss, train_mae = run_epoch(model, train_loader, loss_fn, optimizer)
+        train_loss, train_mae = run_epoch(
+            model, train_loader, loss_fn, optimizer
+        )
 
-        val_loss, val_mae = run_epoch(model, val_loader, loss_fn)
+        val_loss, val_mae = run_epoch(
+            model, val_loader, loss_fn
+        )
 
         history.append(
             {
@@ -91,7 +102,10 @@ def train_model(train_loader, val_loader, epochs=100, learning_rate=0.001):
             best_val_loss = val_loss
             best_val_mae = val_mae
             best_epoch = epoch
-            best_weights = {k: v.clone() for k, v in model.state_dict().items()}
+            best_weights = {
+                k: v.clone()
+                for k, v in model.state_dict().items()
+            }
 
         print(
             f"Epoch {epoch}: "
