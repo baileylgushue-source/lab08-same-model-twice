@@ -1,4 +1,3 @@
-
 import time
 from pathlib import Path
 
@@ -24,9 +23,7 @@ def train_keras(
     keras.utils.set_random_seed(seed)
 
     train_df, val_df, test_df = split_data(seed=seed)
-    X_train, X_val, X_test, _ = prepare_features(
-        train_df, val_df, test_df
-    )
+    X_train, X_val, X_test, _ = prepare_features(train_df, val_df, test_df)
 
     X_train = X_train.astype(np.float32)
     X_val = X_val.astype(np.float32)

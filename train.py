@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -81,13 +80,9 @@ def train_model(
     history = []
 
     for epoch in range(1, epochs + 1):
-        train_loss, train_mae = run_epoch(
-            model, train_loader, loss_fn, optimizer
-        )
+        train_loss, train_mae = run_epoch(model, train_loader, loss_fn, optimizer)
 
-        val_loss, val_mae = run_epoch(
-            model, val_loader, loss_fn
-        )
+        val_loss, val_mae = run_epoch(model, val_loader, loss_fn)
 
         history.append(
             {
@@ -102,10 +97,7 @@ def train_model(
             best_val_loss = val_loss
             best_val_mae = val_mae
             best_epoch = epoch
-            best_weights = {
-                k: v.clone()
-                for k, v in model.state_dict().items()
-            }
+            best_weights = {k: v.clone() for k, v in model.state_dict().items()}
 
         print(
             f"Epoch {epoch}: "

@@ -1,13 +1,10 @@
-
 import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import torch
 from torch import nn
 
-from keras_model import build_keras_model
 from prepare import TARGET, make_loaders, prepare_features, split_data
 from train import run_epoch, train_model
 from train_keras import train_keras
@@ -50,14 +47,16 @@ def compare_models(seeds=(42, 43, 44)):
             nn.MSELoss(),
         )
 
-        results.append({
-            "framework": "PyTorch",
-            "seed": seed,
-            "best_epoch": best_epoch,
-            "validation_mae": val_mae,
-            "test_mae": torch_test_mae,
-            "seconds": torch_seconds,
-        })
+        results.append(
+            {
+                "framework": "PyTorch",
+                "seed": seed,
+                "best_epoch": best_epoch,
+                "validation_mae": val_mae,
+                "test_mae": torch_test_mae,
+                "seconds": torch_seconds,
+            }
+        )
 
         # Keras
         start = time.perf_counter()
@@ -70,38 +69,30 @@ def compare_models(seeds=(42, 43, 44)):
             epochs=100,
         )
 
-        best_keras_epoch = (
-            int(np.argmin(keras_history.history["val_loss"])) + 1
-        )
+        best_keras_epoch = int(np.argmin(keras_history.history["val_loss"])) + 1
 
-        keras_val_mae = keras_history.history["val_mae"][
-            best_keras_epoch - 1
-        ]
+        keras_val_mae = keras_history.history["val_mae"][best_keras_epoch - 1]
 
         # Use the same split and preparation functions
-        _, _, X_test, _ = prepare_features(
-            train_df, val_df, test_df
-        )
+        _, _, X_test, _ = prepare_features(train_df, val_df, test_df)
 
         X_test = X_test.astype(np.float32)
         y_test = test_df[TARGET].to_numpy(dtype=np.float32)
 
-        predictions = keras_model.predict(
-            X_test, verbose=0
-        ).reshape(-1)
+        predictions = keras_model.predict(X_test, verbose=0).reshape(-1)
 
-        keras_test_mae = float(
-            np.mean(np.abs(predictions - y_test))
+        keras_test_mae = float(np.mean(np.abs(predictions - y_test)))
+
+        results.append(
+            {
+                "framework": "Keras",
+                "seed": seed,
+                "best_epoch": best_keras_epoch,
+                "validation_mae": keras_val_mae,
+                "test_mae": keras_test_mae,
+                "seconds": keras_seconds,
+            }
         )
-
-        results.append({
-            "framework": "Keras",
-            "seed": seed,
-            "best_epoch": best_keras_epoch,
-            "validation_mae": keras_val_mae,
-            "test_mae": keras_test_mae,
-            "seconds": keras_seconds,
-        })
 
     comparison = pd.DataFrame(results)
     comparison.to_csv("reports/comparison.csv", index=False)

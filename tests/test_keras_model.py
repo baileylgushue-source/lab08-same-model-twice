@@ -47,19 +47,16 @@ def test_copy_torch_weights():
     torch_model.eval()
 
     with torch.no_grad():
-        torch_predictions = torch_model(
-            torch.tensor(x)
-        ).numpy()
+        torch_predictions = torch_model(torch.tensor(x)).numpy()
 
-    keras_predictions = keras_model(
-        x, training=False
-    ).numpy()
+    keras_predictions = keras_model(x, training=False).numpy()
 
     np.testing.assert_allclose(
         torch_predictions.reshape(-1),
         keras_predictions.reshape(-1),
         atol=1e-5,
     )
+
 
 def test_keras_model_save_and_load(tmp_path):
     model = build_keras_model(input_size=8, hidden_size=16)
@@ -79,12 +76,11 @@ def test_keras_model_save_and_load(tmp_path):
         atol=1e-5,
     )
 
+
 def test_keras_small_batch_memorization():
     keras.utils.set_random_seed(42)
 
-    x = np.random.default_rng(42).normal(
-        size=(8, 8)
-    ).astype(np.float32)
+    x = np.random.default_rng(42).normal(size=(8, 8)).astype(np.float32)
 
     y = np.sum(x, axis=1).astype(np.float32)
 
@@ -109,6 +105,7 @@ def test_keras_small_batch_memorization():
 
     assert final_loss < initial_loss
     assert final_loss < 0.01
+
 
 def test_keras_repeatability():
     x = np.ones((5, 8), dtype=np.float32)
